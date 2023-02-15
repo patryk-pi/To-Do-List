@@ -8,4 +8,12 @@ body {
   width: 70px;
 }
 
+.title {
+  margin-bottom: 0;
+}
 
+#task-date{
+  ::placeholder {
+    color: transparent;
+  }
+}

@@ -12,15 +12,21 @@
 <body>
 <header class="mb-5">
     <div class="row">
-        <nav class="navbar p-3" style="background-color: #74c0fc">
+        <nav class="navbar p-3 bg-info" style="height: 120px">
 
             <div class="col">
                 <div class="container-fluid d-flex justify-content-center align-item-center">
-                    <svg class="icon" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                    <svg class="icon me-3" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"
+                         xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
                          viewBox="0 0 512 512" style="enable-background:new 0 0 512 512;" xml:space="preserve">
 <style type="text/css">
-	.st0{fill:#FFC112;}
-    .st1{fill:#141C28;}
+	.st0 {
+        fill: #FFC112;
+    }
+
+    .st1 {
+        fill: #141C28;
+    }
 </style>
                         <title>checklist-flat</title>
                         <path class="st0" d="M396.8,38.4h-57.6c4.2,5.5,6.5,12.3,6.5,19.2V96c0,17.7-14.3,32-32,32H198.4c-17.7,0-32-14.3-32-32V57.6
@@ -45,9 +51,9 @@
                     <h1 class="title align-self-center">To-Do-List</h1>
                 </div>
             </div>
-           <!-- <div class="col text-end">
-                <div class="p-3 col" id="clock"></div>
-            </div>-->
+            <!-- <div class="col text-end">
+                 <div class="p-3 col" id="clock"></div>
+             </div>-->
 
         </nav>
     </div>
@@ -62,19 +68,26 @@
 
 </div>-->
 
-<section class="container">
-<form class="d-flex flex-column ">
-    <div class="mb-0 p-3">
-        <label for="task-name" class="form-label h4">Nazwa zadania</label>
-        <input type="email" class="form-control" id="task-name">
-    </div>
-    <div class="mb-3 p-3">
-        <label for="task-description" class="form-label h4">Opis zadania</label>
-        <textarea class="form-control" id="task-description" rows="3"></textarea>
-    </div>
-    <button type="button" class="btn btn-lg btn-info align-self-center">Dodaj zadanie</button>
-</form>
+<section class="container mb-5">
+    <form id="task-form">
+        <div class="d-flex flex-column ">
+            <div class="mb-0 p-3">
+                <label for="task-name" class="form-label h4">Nazwa zadania</label>
+                <input type="text" class="form-control" id="task-name">
+            </div>
+            <div class="mb-0 p-3">
+                <label for="task-description" class="form-label h4">Opis zadania</label>
+                <textarea class="form-control" id="task-description" rows="2"></textarea>
+            </div>
+            <div class="mb-0 p-3" style="max-width: 250px">
+                <label for="task-name" class="form-label h4">Zaplanowana data wykonania</label>
+                <input type="date" class="form-control" id="task-date">
+            </div>
+        </div>
+        <button type="submit" class="btn ltn-lg btn-info m-3 ">Dodaj zadanie</button>
+    </form>
 </section>
+
 
 
 <div class="container text-center mt-5">
@@ -82,16 +95,7 @@
 
         <div class="col">
             <h4 class="mb-4"> Zadania zaplanowane</h4>
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Card title</h5>
-                    <p class="card-text">This is a wider card with supporting text below as a natural lead-in to
-                        additional
-                        content. This content is a little bit longer.</p>
-                </div>
-                <div class="card-footer">
-                    <small class="text-muted">Last updated 3 mins ago</small>
-                </div>
+            <div id="planned-tasks">
             </div>
         </div>
         <div class="col">
@@ -116,8 +120,11 @@
                         additional
                         content. </p>
                 </div>
+
                 <div class="card-footer">
+                    <button type="button" class="btn btn-success">Success</button>
                     <small class="text-muted">Last updated 3 mins ago</small>
+                    <button type="button" class="btn btn-danger">Danger</button>
                 </div>
             </div>
             <div class="card mt-5">
@@ -133,7 +140,6 @@
                 </div>
             </div>
             <div class="card mt-5">
-
                 <div class="card-body">
                     <h5 class="card-title">Card title</h5>
                     <p class="card-text">This is a wider card with supporting text below as a natural lead-in to
