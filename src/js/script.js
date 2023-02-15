@@ -46,6 +46,7 @@ class App {
             this.addNewTask();
         });
         this.setDateInput();
+        this.renderTasks();
     }
 
     addNewTask() {
@@ -60,37 +61,27 @@ class App {
         }
         const newTask = new Task(taskName, taskDesc, taskDate);
 
-        localStorage.setItem(newTask.name, JSON.stringify(newTask));
+        let dataFormLocalStorage = [];
+        if (localStorage.getItem('tasks') !== null) {
+            dataFormLocalStorage = JSON.parse(localStorage.getItem("tasks"));
+        }
+
         this.tasks.push(newTask);
         console.log(newTask);
+        this.saveTaskToLocalStorage(newTask)
         this.updatePlannedTasksList();
+
+        $nameInput.value = $descInput.value = '';
+        this.setDateInput();
+
     }
 
     updatePlannedTasksList() {
         $plannedTasks.innerHTML = '';
 
         this.tasks.forEach(task => {
-            const {name, description: desc, date} = task
-            const html = `<div class="card mt-5">
-
-                <div class="card-body">
-                    <h5 class="card-title">${name}</h5>
-                    <p class="card-text">${desc} </p>
-                </div>
-              
-                <div class="card-footer d-flex justify-content-around align-items-center">
-                    <button type="button" class="btn btn-success">✅ Wykonano!</button>
-                    <small class="text-muted">Zaplanowana data wykonania: ${date}</small>
-                    <button type="button" class="btn btn-danger">🚮 Usuń</button>
-                </div>
-            </div>`;
-
-            $plannedTasks.insertAdjacentHTML('beforeend', html);
+          this.updateTaskList(task);
         });
-
-
-
-
     }
 
     // DATES
@@ -111,7 +102,63 @@ class App {
         $dateInput.value = this.formatDate();
     }
 
+    // LOCAL STORAGE
+
+    saveTaskToLocalStorage(task) {
+        let dataFromLocalStorage = [];
+        if (localStorage.getItem('tasks') !== null) {
+            dataFromLocalStorage = JSON.parse(localStorage.getItem('tasks'));
+            dataFromLocalStorage.push(task);
+            localStorage.setItem('tasks', JSON.stringify(dataFromLocalStorage))
+        } else {
+            dataFromLocalStorage.push(task);
+            localStorage.setItem('tasks', JSON.stringify(dataFromLocalStorage))
+        }
+        alert('Dodano nowe zadanie!')
+    }
+
+    renderTasks() {
+        const allTasks = JSON.parse(localStorage.getItem("tasks"));
+
+        allTasks.filter(task=> {
+            return task.status === true;
+        }).forEach((task, i) => {
+                this.updateTaskList(task);
+                this.tasks.push(task, i);
+            }
+        );
+
+    }
+
+    updateTaskList(task, index) {
+        const {name, description: desc, date} = task
+        const html = `<div class="card mt-5">
+
+                <div class="card-body" data-id="${index}">
+                    <h5 class="card-title">${name}</h5>
+                    <p class="card-text">${desc} </p>
+                </div>
+              
+                <div class="card-footer d-flex justify-content-around align-items-center">
+                    
+                    <small class="text-muted">Zaplanowana data wykonania: ${date}</small>
+                    <div class="btn-group" role="group" aria-label="Basic example">
+  <button type="button" class="btn btn-success">Left</button>
+  <button type="button" class="btn btn-outline-warning">Middle</button>
+  <button type="button" class="btn btn-outline-danger">Right</button>
+</div>
+                    
+                </div>
+            </div>`;
+
+        $plannedTasks.insertAdjacentHTML('beforeend', html);
+
+    }
+
+
 }
 
 const app = new App;
+
+
 
