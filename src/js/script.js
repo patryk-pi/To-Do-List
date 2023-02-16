@@ -51,13 +51,13 @@ class App {
 
     addNewTask() {
 
-
         const taskName = $nameInput.value;
         const taskDesc = $descInput.value;
         const taskDate = $dateInput.value;
 
         if (!taskName || !taskDesc || !taskDate) {
-            alert('Uzupełnij wszystkie pola!')
+            alert('Uzupełnij wszystkie pola!');
+            return;
         }
         const newTask = new Task(taskName, taskDesc, taskDate);
 
@@ -152,7 +152,6 @@ class App {
             </div>`;
 
         $plannedTasks.insertAdjacentHTML('beforeend', html);
-
     }
 
 
