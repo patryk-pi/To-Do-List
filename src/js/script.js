@@ -4,7 +4,8 @@ const $nameInput = document.getElementById('task-name');
 const $descInput = document.getElementById('task-description')
 const $dateInput = document.getElementById('task-date');
 const $taskForm = document.getElementById('task-form');
-const $plannedTasks = document.getElementById('planned-tasks')
+const $plannedTasks = document.getElementById('planned-tasks');
+let $btnsDone = document.querySelectorAll('.btn-done');
 
 
 /*
@@ -33,7 +34,7 @@ class Task {
         this.name = name;
         this.description = description;
         this.date = date;
-        this.status = true;
+        this.active = true;
     }
 }
 
@@ -47,6 +48,8 @@ class App {
         });
         this.setDateInput();
         this.renderTasks();
+        this.markTaskAsDone();
+
     }
 
     addNewTask() {
@@ -120,14 +123,28 @@ class App {
     renderTasks() {
         const allTasks = JSON.parse(localStorage.getItem("tasks"));
 
-        allTasks.filter(task=> {
+        this.renderDoneTasks(allTasks);
+        this.renderPlannedTasks(allTasks);
+    }
+
+    renderPlannedTasks(array) {
+        array.filter(task=> {
             return task.status === true;
         }).forEach((task, i) => {
-                this.updateTaskList(task);
+                this.updateTaskList(task, i);
                 this.tasks.push(task, i);
             }
         );
+    }
 
+    renderDoneTasks(array) {
+        array.filter(task=> {
+            return task.status !== true;
+        }).forEach((task, i) => {
+                this.updateTaskList(task, i);
+                this.tasks.push(task, i);
+            }
+        );
     }
 
     updateTaskList(task, index) {
@@ -143,7 +160,7 @@ class App {
                     
                     <small class="text-muted">Zaplanowana data wykonania: ${date}</small>
                     <div class="btn-group" role="group" aria-label="Basic example">
-  <button type="button" class="btn btn-success">Left</button>
+  <button type="button" class="btn btn-success btn-done">Left</button>
   <button type="button" class="btn btn-outline-warning">Middle</button>
   <button type="button" class="btn btn-outline-danger">Right</button>
 </div>
@@ -155,6 +172,24 @@ class App {
     }
 
 
+    moveTask(task) {
+       task.active === true ? task.active = false : task.active = true;
+    }
+
+    markTaskAsDone() {
+
+        $btnsDone = document.querySelectorAll('.btn-done');
+
+        $btnsDone.forEach(btn => {
+            btn.addEventListener('click', e => {
+                e.preventDefault();
+                const dataId = +e.target.parentElement.parentElement.previousElementSibling.getAttribute('data-id')
+                this.moveTask(this.tasks[dataId]);
+                console.log(this.tasks[dataId])
+
+            });
+        })
+    }
 }
 
 const app = new App;
