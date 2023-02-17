@@ -40,7 +40,9 @@ class Task {
 }
 
 class App {
-    tasks = [];
+    plannedTasks = [];
+    doneTasks = [];
+    $btnsDone = document.querySelectorAll('.btn-done');
 
     constructor() {
         $taskForm.addEventListener('submit', e => {
@@ -49,8 +51,9 @@ class App {
         });
         this.setDateInput();
         this.renderTasks();
-        this.tasks = [...JSON.parse(localStorage.getItem("tasks"))];
-        console.log(this.tasks)
+        this.plannedTasks = [...JSON.parse(localStorage.getItem("tasks")).filter(task => task.active === true)];
+        this.doneTasks = [...JSON.parse(localStorage.getItem("tasks")).filter(task => task.active === false)];
+        console.log(this.plannedTasks)
     }
 
     addNewTask() {
@@ -70,7 +73,7 @@ class App {
             dataFormLocalStorage = JSON.parse(localStorage.getItem("tasks"));
         }
 
-        this.tasks.push(newTask);
+        this.plannedTasks.push(newTask);
         console.log(newTask);
         this.saveTaskToLocalStorage(newTask)
         this.updatePlannedTasksList();
@@ -83,12 +86,23 @@ class App {
     updatePlannedTasksList() {
         $plannedTasks.innerHTML = '';
 
-        this.tasks.forEach(task => {
-          this.updateTaskList(task);
-          console.log(task)
-            console.log(this.tasks)
+        this.plannedTasks.filter(task => task.active === true).forEach((task, index) => {
+            this.updateTaskList(task, index);
+
+        });
+
+        $btnsDone = document.querySelectorAll('.btn-done');
+    }
+
+    updateDoneTasksList() {
+        $doneTasks.innerHTML = '';
+
+        this.doneTasks.filter(task => task.active === false).forEach((task, index) => {
+            this.updateTaskList(task, index);
+
         });
     }
+
 
     // DATES
 
@@ -126,31 +140,31 @@ class App {
         const allTasks = JSON.parse(localStorage.getItem("tasks"));
 
         allTasks.forEach(task => {
-            this.tasks.push(task);
+            this.plannedTasks.push(task);
         })
 
-        this.renderDoneTasks(this.tasks);
+        this.renderDoneTasks(this.plannedTasks);
         this.renderPlannedTasks(allTasks);
         this.markTaskAsDone()
 
     }
 
     renderPlannedTasks(array) {
-        array.filter(task=> {
+        array.filter(task => {
             return task.active === true;
         }).forEach((task, i) => {
                 this.updateTaskList(task, i);
-                this.tasks.push(task, i);
+                this.plannedTasks.push(task, i);
             }
         );
     }
 
     renderDoneTasks(array) {
-        array.filter(task=> {
+        array.filter(task => {
             return task.active !== true;
         }).forEach((task, i) => {
                 this.updateTaskList(task, i);
-                this.tasks.push(task, i);
+                this.plannedTasks.push(task, i);
             }
         );
     }
@@ -168,7 +182,7 @@ class App {
                     
                     <small class="text-muted">Zaplanowana data wykonania: ${date}</small>
                     <div class="btn-group" role="group" aria-label="Basic example">
-  <button type="button" class="btn btn-success btn-done">Left</button>
+  <button type="button" class="btn btn-success ${active === true ? 'btn-done' : 'btn-primary'}">Left</button>
   <button type="button" class="btn btn-outline-warning">Middle</button>
   <button type="button" class="btn btn-outline-danger">Right</button>
 </div>
@@ -176,13 +190,14 @@ class App {
                 </div>
             </div>`;
 
-        active === true ? $plannedTasks.insertAdjacentHTML('beforeend', html) : $doneTasks.insertAdjacentHTML('beforeend', html)
+        active === true ? $plannedTasks.insertAdjacentHTML('beforeend', html) : $doneTasks.insertAdjacentHTML('beforeend', html);
+        $btnsDone = document.querySelectorAll('.btn-done');
 
     }
 
 
     moveTask(task) {
-       task.active === true ? task.active = false : task.active = true;
+        task.active === true ? task.active = false : task.active = true;
     }
 
     markTaskAsDone() {
@@ -193,24 +208,22 @@ class App {
             btn.addEventListener('click', e => {
                 e.preventDefault();
                 const dataId = +e.target.parentElement.parentElement.previousElementSibling.getAttribute('data-id')
-                const parent = e.target.parentElement.parentElement.previousElementSibling.parentElement;
-
-
-                this.moveTask(this.tasks[dataId]);
-                console.log(this.tasks[dataId])
-                this.tasks.push(this.tasks[dataId])
-                this.updateTaskList(this.tasks[dataId], [dataId]);
-                localStorage.clear();
-
-                this.tasks.forEach( task => {
-                    this.saveTaskToLocalStorage(task)
-                })
-                parent.remove();
-                console.log(this.tasks)
+                console.log(dataId)
+                this.moveTask(this.plannedTasks[dataId])
+                this.doneTasks.push(this.plannedTasks[dataId]);
+                this.plannedTasks.splice(dataId, 1)
+                this.updateDoneTasksList();
+                this.updatePlannedTasksList();
+                localStorage.setItem('tasks', JSON.stringify(this.plannedTasks));
 
             });
-        })
+        });
+
+
+
+
     }
+
 }
 
 const app = new App;
