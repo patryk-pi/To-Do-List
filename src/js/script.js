@@ -5,6 +5,7 @@ const $descInput = document.getElementById('task-description')
 const $dateInput = document.getElementById('task-date');
 const $taskForm = document.getElementById('task-form');
 const $plannedTasks = document.getElementById('planned-tasks');
+const $doneTasks = document.getElementById('done-tasks')
 let $btnsDone = document.querySelectorAll('.btn-done');
 
 
@@ -48,8 +49,8 @@ class App {
         });
         this.setDateInput();
         this.renderTasks();
-        this.markTaskAsDone();
-
+        this.tasks = [...JSON.parse(localStorage.getItem("tasks"))];
+        console.log(this.tasks)
     }
 
     addNewTask() {
@@ -84,6 +85,8 @@ class App {
 
         this.tasks.forEach(task => {
           this.updateTaskList(task);
+          console.log(task)
+            console.log(this.tasks)
         });
     }
 
@@ -117,19 +120,24 @@ class App {
             dataFromLocalStorage.push(task);
             localStorage.setItem('tasks', JSON.stringify(dataFromLocalStorage))
         }
-        alert('Dodano nowe zadanie!')
     }
 
     renderTasks() {
         const allTasks = JSON.parse(localStorage.getItem("tasks"));
 
-        this.renderDoneTasks(allTasks);
+        allTasks.forEach(task => {
+            this.tasks.push(task);
+        })
+
+        this.renderDoneTasks(this.tasks);
         this.renderPlannedTasks(allTasks);
+        this.markTaskAsDone()
+
     }
 
     renderPlannedTasks(array) {
         array.filter(task=> {
-            return task.status === true;
+            return task.active === true;
         }).forEach((task, i) => {
                 this.updateTaskList(task, i);
                 this.tasks.push(task, i);
@@ -139,7 +147,7 @@ class App {
 
     renderDoneTasks(array) {
         array.filter(task=> {
-            return task.status !== true;
+            return task.active !== true;
         }).forEach((task, i) => {
                 this.updateTaskList(task, i);
                 this.tasks.push(task, i);
@@ -148,7 +156,7 @@ class App {
     }
 
     updateTaskList(task, index) {
-        const {name, description: desc, date} = task
+        const {name, description: desc, date, active} = task
         const html = `<div class="card mt-5">
 
                 <div class="card-body" data-id="${index}">
@@ -168,7 +176,8 @@ class App {
                 </div>
             </div>`;
 
-        $plannedTasks.insertAdjacentHTML('beforeend', html);
+        active === true ? $plannedTasks.insertAdjacentHTML('beforeend', html) : $doneTasks.insertAdjacentHTML('beforeend', html)
+
     }
 
 
@@ -184,8 +193,20 @@ class App {
             btn.addEventListener('click', e => {
                 e.preventDefault();
                 const dataId = +e.target.parentElement.parentElement.previousElementSibling.getAttribute('data-id')
+                const parent = e.target.parentElement.parentElement.previousElementSibling.parentElement;
+
+
                 this.moveTask(this.tasks[dataId]);
                 console.log(this.tasks[dataId])
+                this.tasks.push(this.tasks[dataId])
+                this.updateTaskList(this.tasks[dataId], [dataId]);
+                localStorage.clear();
+
+                this.tasks.forEach( task => {
+                    this.saveTaskToLocalStorage(task)
+                })
+                parent.remove();
+                console.log(this.tasks)
 
             });
         })
