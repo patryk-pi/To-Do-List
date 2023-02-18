@@ -6,7 +6,6 @@ const $dateInput = document.getElementById('task-date');
 const $taskForm = document.getElementById('task-form');
 const $plannedTasks = document.getElementById('planned-tasks');
 const $doneTasks = document.getElementById('done-tasks')
-let $btnsDone = document.querySelectorAll('.btn-done');
 
 
 /*
@@ -42,7 +41,6 @@ class Task {
 class App {
     plannedTasks = [];
     doneTasks = [];
-    $btnsDone = document.querySelectorAll('.btn-done');
 
     constructor() {
         $taskForm.addEventListener('submit', e => {
@@ -53,8 +51,9 @@ class App {
         this.renderTasks();
         this.plannedTasks = [...JSON.parse(localStorage.getItem("tasks")).filter(task => task.active === true)];
         this.doneTasks = [...JSON.parse(localStorage.getItem("tasks")).filter(task => task.active === false)];
-        console.log(this.plannedTasks)
+        console.log(this.plannedTasks);
     }
+
 
     addNewTask() {
 
@@ -90,8 +89,7 @@ class App {
             this.updateTaskList(task, index);
 
         });
-
-        $btnsDone = document.querySelectorAll('.btn-done');
+        this.addDoneButtonListeners();
     }
 
     updateDoneTasksList() {
@@ -99,8 +97,19 @@ class App {
 
         this.doneTasks.filter(task => task.active === false).forEach((task, index) => {
             this.updateTaskList(task, index);
-
         });
+
+    }
+
+    addDoneButtonListeners() {
+        const doneButtons = document.querySelectorAll('.btn-done');
+
+        doneButtons.forEach(btn => {
+            btn.addEventListener('click', e => {
+                this.markTaskAsDone(e);
+            })
+        })
+
     }
 
 
@@ -143,9 +152,9 @@ class App {
             this.plannedTasks.push(task);
         })
 
-        this.renderDoneTasks(this.plannedTasks);
+        this.renderDoneTasks(allTasks);
         this.renderPlannedTasks(allTasks);
-        this.markTaskAsDone()
+        this.addDoneButtonListeners();
 
     }
 
@@ -154,7 +163,6 @@ class App {
             return task.active === true;
         }).forEach((task, i) => {
                 this.updateTaskList(task, i);
-                this.plannedTasks.push(task, i);
             }
         );
     }
@@ -164,7 +172,6 @@ class App {
             return task.active !== true;
         }).forEach((task, i) => {
                 this.updateTaskList(task, i);
-                this.plannedTasks.push(task, i);
             }
         );
     }
@@ -191,7 +198,7 @@ class App {
             </div>`;
 
         active === true ? $plannedTasks.insertAdjacentHTML('beforeend', html) : $doneTasks.insertAdjacentHTML('beforeend', html);
-        $btnsDone = document.querySelectorAll('.btn-done');
+
 
     }
 
@@ -200,29 +207,26 @@ class App {
         task.active === true ? task.active = false : task.active = true;
     }
 
-    markTaskAsDone() {
+    markTaskAsDone(e) {
 
-        $btnsDone = document.querySelectorAll('.btn-done');
-
-        $btnsDone.forEach(btn => {
-            btn.addEventListener('click', e => {
-                e.preventDefault();
-                const dataId = +e.target.parentElement.parentElement.previousElementSibling.getAttribute('data-id')
-                console.log(dataId)
-                this.moveTask(this.plannedTasks[dataId])
-                this.doneTasks.push(this.plannedTasks[dataId]);
-                this.plannedTasks.splice(dataId, 1)
-                this.updateDoneTasksList();
-                this.updatePlannedTasksList();
-                localStorage.setItem('tasks', JSON.stringify(this.plannedTasks));
-
-            });
-        });
+        const $btnsDone = document.querySelectorAll('.btn-done');
+        console.log('Mark task as don')
 
 
+        e.preventDefault();
 
+        const dataId = +e.target.parentElement.parentElement.previousElementSibling.getAttribute('data-id')
+        this.moveTask(this.plannedTasks[dataId])
+        this.doneTasks.push(this.plannedTasks[dataId]);
+        this.plannedTasks.splice(dataId, 1)
+        this.updateDoneTasksList();
+        this.updatePlannedTasksList();
+        const allTasks = [...this.plannedTasks, ...this.doneTasks]
+        localStorage.setItem('tasks', JSON.stringify(allTasks));
+        console.log('Działam')
 
     }
+
 
 }
 
