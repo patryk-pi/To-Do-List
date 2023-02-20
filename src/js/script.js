@@ -91,6 +91,7 @@ class App {
         });
         this.addDoneButtonListeners();
         this.addDeleteButtonListener();
+        this.addReturnButtonListener();
     }
 
     updateDoneTasksList() {
@@ -113,14 +114,28 @@ class App {
     }
 
     addDeleteButtonListener() {
-    const deleteButtons = document.querySelectorAll('.btn-delete');
+        const deleteButtons = document.querySelectorAll('.btn-delete');
 
-    deleteButtons.forEach(btn => {
-        btn.addEventListener('click', e => {
-            this.deleteTask(e)
+        deleteButtons.forEach(btn => {
+            btn.addEventListener('click', e => {
+                this.deleteTask(e)
+            })
+        });
+    }
+
+    addReturnButtonListener() {
+        const returnButtons = document.querySelectorAll('.btn-return');
+
+        returnButtons.forEach(btn => {
+            btn.addEventListener('click', e => {
+                this.markTaskAsUndone(e);
+            })
         })
-    })
-}
+    }
+
+    addEditButtonListener() {
+        const editButtons = document.querySelectorAll('.btn-edit')
+    }
 
 
     // DATES
@@ -166,6 +181,7 @@ class App {
         this.renderPlannedTasks(allTasks);
         this.addDoneButtonListeners();
         this.addDeleteButtonListener();
+        this.addReturnButtonListener();
 
     }
 
@@ -189,7 +205,8 @@ class App {
 
     updateTaskHtml(task, index) {
         const {name, description: desc, date, active} = task
-        const html = `<div class="card mt-5">
+        const html = active === true ? `<div class="card mt-5">
+       
 
                 <div class="card-body" data-id="${index}">
                     <h5 class="card-title">${name}</h5>
@@ -200,13 +217,27 @@ class App {
                     
                     <small class="text-muted">Zaplanowana data wykonania: ${date}</small>
                     <div class="btn-group" role="group" >
-  <button type="button" class="btn btn-success ${active === true ? 'btn-done' : 'btn-primary'}">Wykonano</button>
-  <button type="button" class="btn btn-outline-warning">Middle</button>
-  <button type="button" class="btn btn-outline-danger btn-delete">Right</button>
-</div>
-                    
+  <button type="button" class="btn btn-success btn-done">Wykonano</button>
+  <button type="button" class="btn btn-outline-warning btn-edit">Edytuj</button>
+  <button type="button" class="btn btn-outline-danger btn-delete">Usuń</button>
+</div>  </div>
+            </div>` : `<div class="card mt-5">
+
+                <div class="card-body" data-id="${index}">
+                    <h5 class="card-title">${name}</h5>
+                    <p class="card-text">${desc} </p>
                 </div>
-            </div>`;
+              
+                <div class="card-footer d-flex justify-content-around align-items-center">
+                    
+                    <small class="text-muted">Wykonano: ${date}</small>
+                    <div class="btn-group" role="group" >
+  <button type="button" class="btn btn-outline-success btn-return">Przywróc do zaplanowanych</button>
+  <button type="button" class="btn btn-outline-danger btn-delete">Usuń</button>
+</div>`
+
+
+        ;
 
         active === true ? $plannedTasks.insertAdjacentHTML('beforeend', html) : $doneTasks.insertAdjacentHTML('beforeend', html);
 
@@ -228,6 +259,16 @@ class App {
         this.updateTasksList();
     }
 
+    markTaskAsUndone(event) {
+
+        event.preventDefault();
+        const dataId = +event.target.parentElement.parentElement.previousElementSibling.getAttribute('data-id');
+        this.moveTask(this.doneTasks[dataId])
+        this.plannedTasks.push(this.doneTasks[dataId]);
+        this.doneTasks.splice(dataId, 1)
+        this.updateTasksList();
+    }
+
     deleteTask(event) {
         event.preventDefault();
         const dataId = +event.target.parentElement.parentElement.previousElementSibling.getAttribute('data-id');
@@ -239,9 +280,13 @@ class App {
             this.doneTasks.splice(dataId, 1);
             this.updateTasksList();
         }
+    }
 
-
-
+    editTask(event) {
+        event.preventDefault();
+        const dataId = +event.target.parentElement.parentElement.previousElementSibling.getAttribute('data-id');
+        $taskForm.scrollIntoView();
+        $nameInput.value = this.plannedTasks[dataId].name
     }
 
     updateTasksList() {
