@@ -4,8 +4,13 @@ const $nameInput = document.getElementById('task-name');
 const $descInput = document.getElementById('task-description')
 const $dateInput = document.getElementById('task-date');
 const $taskForm = document.getElementById('task-form');
+const $nameInputEdit = document.getElementById('task-name-edit');
+const $descInputEdit = document.getElementById('task-description-edit')
+const $dateInputEdit = document.getElementById('task-date-edit');
+const $taskFormEdit = document.querySelector('.edit-section');
+const $overlay = document.querySelector('.overlay');
 const $plannedTasks = document.getElementById('planned-tasks');
-const $doneTasks = document.getElementById('done-tasks')
+const $doneTasks = document.getElementById('done-tasks');
 
 
 /*
@@ -92,6 +97,7 @@ class App {
         this.addDoneButtonListeners();
         this.addDeleteButtonListener();
         this.addReturnButtonListener();
+        this.addEditButtonListener();
     }
 
     updateDoneTasksList() {
@@ -134,7 +140,14 @@ class App {
     }
 
     addEditButtonListener() {
-        const editButtons = document.querySelectorAll('.btn-edit')
+        const editButtons = document.querySelectorAll('.btn-edit');
+
+        editButtons.forEach(btn => {
+            btn.addEventListener('click', e => {
+                e.preventDefault();
+                this.editTask(e);
+            })
+        })
     }
 
 
@@ -182,6 +195,7 @@ class App {
         this.addDoneButtonListeners();
         this.addDeleteButtonListener();
         this.addReturnButtonListener();
+        this.addEditButtonListener();
 
     }
 
@@ -283,10 +297,37 @@ class App {
     }
 
     editTask(event) {
-        event.preventDefault();
         const dataId = +event.target.parentElement.parentElement.previousElementSibling.getAttribute('data-id');
-        $taskForm.scrollIntoView();
-        $nameInput.value = this.plannedTasks[dataId].name
+        $taskFormEdit.classList.remove('hidden');
+        $overlay.classList.remove('hidden');
+        $nameInputEdit.value = this.plannedTasks[dataId].name
+        $descInputEdit.value = this.plannedTasks[dataId].description
+        $dateInputEdit.value = this.plannedTasks[dataId].date;
+        this.plannedTasks.splice(dataId, 1);
+
+        document.getElementById('btn-edit-task').addEventListener('click', e => {
+            e.preventDefault();
+
+            this.plannedTasks.splice(dataId, 1);
+            const newTask = new Task(taskName, taskDesc, taskDate);
+
+            let dataFormLocalStorage = [];
+            if (localStorage.getItem('tasks') !== null) {
+                dataFormLocalStorage = JSON.parse(localStorage.getItem("tasks"));
+            }
+
+            this.plannedTasks.splice(dataId, 0, newTask);
+            console.log(newTask);
+            this.saveTaskToLocalStorage(newTask)
+            this.updatePlannedTasksList();
+
+            $nameInput.value = $descInput.value = '';
+            this.setDateInput();
+
+            $taskFormEdit.classList.add('hidden');
+            $overlay.classList.add('hidden');
+        })
+
     }
 
     updateTasksList() {
