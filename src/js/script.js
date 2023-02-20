@@ -86,17 +86,18 @@ class App {
         $plannedTasks.innerHTML = '';
 
         this.plannedTasks.filter(task => task.active === true).forEach((task, index) => {
-            this.updateTaskList(task, index);
+            this.updateTaskHtml(task, index);
 
         });
         this.addDoneButtonListeners();
+        this.addDeleteButtonListener();
     }
 
     updateDoneTasksList() {
         $doneTasks.innerHTML = '';
 
         this.doneTasks.filter(task => task.active === false).forEach((task, index) => {
-            this.updateTaskList(task, index);
+            this.updateTaskHtml(task, index);
         });
 
     }
@@ -109,8 +110,17 @@ class App {
                 this.markTaskAsDone(e);
             })
         })
-
     }
+
+    addDeleteButtonListener() {
+    const deleteButtons = document.querySelectorAll('.btn-delete');
+
+    deleteButtons.forEach(btn => {
+        btn.addEventListener('click', e => {
+            this.deleteTask(e)
+        })
+    })
+}
 
 
     // DATES
@@ -155,6 +165,7 @@ class App {
         this.renderDoneTasks(allTasks);
         this.renderPlannedTasks(allTasks);
         this.addDoneButtonListeners();
+        this.addDeleteButtonListener();
 
     }
 
@@ -162,7 +173,7 @@ class App {
         array.filter(task => {
             return task.active === true;
         }).forEach((task, i) => {
-                this.updateTaskList(task, i);
+                this.updateTaskHtml(task, i);
             }
         );
     }
@@ -171,12 +182,12 @@ class App {
         array.filter(task => {
             return task.active !== true;
         }).forEach((task, i) => {
-                this.updateTaskList(task, i);
+                this.updateTaskHtml(task, i);
             }
         );
     }
 
-    updateTaskList(task, index) {
+    updateTaskHtml(task, index) {
         const {name, description: desc, date, active} = task
         const html = `<div class="card mt-5">
 
@@ -188,10 +199,10 @@ class App {
                 <div class="card-footer d-flex justify-content-around align-items-center">
                     
                     <small class="text-muted">Zaplanowana data wykonania: ${date}</small>
-                    <div class="btn-group" role="group" aria-label="Basic example">
-  <button type="button" class="btn btn-success ${active === true ? 'btn-done' : 'btn-primary'}">Left</button>
+                    <div class="btn-group" role="group" >
+  <button type="button" class="btn btn-success ${active === true ? 'btn-done' : 'btn-primary'}">Wykonano</button>
   <button type="button" class="btn btn-outline-warning">Middle</button>
-  <button type="button" class="btn btn-outline-danger">Right</button>
+  <button type="button" class="btn btn-outline-danger btn-delete">Right</button>
 </div>
                     
                 </div>
@@ -207,24 +218,37 @@ class App {
         task.active === true ? task.active = false : task.active = true;
     }
 
-    markTaskAsDone(e) {
+    markTaskAsDone(event) {
+        event.preventDefault();
 
-        const $btnsDone = document.querySelectorAll('.btn-done');
-        console.log('Mark task as don')
-
-
-        e.preventDefault();
-
-        const dataId = +e.target.parentElement.parentElement.previousElementSibling.getAttribute('data-id')
+        const dataId = +event.target.parentElement.parentElement.previousElementSibling.getAttribute('data-id')
         this.moveTask(this.plannedTasks[dataId])
         this.doneTasks.push(this.plannedTasks[dataId]);
         this.plannedTasks.splice(dataId, 1)
+        this.updateTasksList();
+    }
+
+    deleteTask(event) {
+        event.preventDefault();
+        const dataId = +event.target.parentElement.parentElement.previousElementSibling.getAttribute('data-id');
+        const targetArray = String(event.target.parentElement.parentElement.parentElement.parentElement.id);
+        if (targetArray === 'planned-tasks') {
+            this.plannedTasks.splice(dataId, 1);
+            this.updateTasksList();
+        } else {
+            this.doneTasks.splice(dataId, 1);
+            this.updateTasksList();
+        }
+
+
+
+    }
+
+    updateTasksList() {
         this.updateDoneTasksList();
         this.updatePlannedTasksList();
         const allTasks = [...this.plannedTasks, ...this.doneTasks]
         localStorage.setItem('tasks', JSON.stringify(allTasks));
-        console.log('Działam')
-
     }
 
 
