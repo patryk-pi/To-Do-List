@@ -129,6 +129,7 @@ class App {
             btn.addEventListener('click', e => {
                 e.preventDefault();
                 this.editTask(e);
+                btn.blur();
             })
         })
     }
@@ -304,12 +305,28 @@ class App {
     editTask(event) {
         let dataId = +event.target.parentElement.parentElement.previousElementSibling.getAttribute('data-id');
 
-        $taskFormEdit.classList.remove('hidden');
-        $overlay.classList.remove('hidden');
+        this.showEditForm();
         $nameInputEdit.value = this.plannedTasks[dataId].name
         $descInputEdit.value = this.plannedTasks[dataId].description
-        $dateInputEdit.value = this.plannedTasks[dataId].date;
-        // this.plannedTasks.splice(dataId, 1);
+        $dateInputEdit.value = this.plannedTasks[dataId].plannedDate;
+        const $closeBtn = document.querySelector('.close-modal');
+        console.log(this.plannedTasks[dataId])
+
+        $closeBtn.addEventListener('click', e=> {
+            e.preventDefault();
+            this.closeEditForm();
+        });
+
+        $overlay.addEventListener('click', () => {
+            this.closeEditForm();
+        });
+
+        document.addEventListener("keydown", e=> {
+            if (e.key === "Escape" && (!$taskFormEdit.classList.contains("hidden"))) {
+                this.closeEditForm();
+            }
+        })
+
 
         $taskFormEdit.addEventListener('submit', e => {
             e.preventDefault();
@@ -329,9 +346,18 @@ class App {
         this.updateTasksList();
 
 
+       this.closeEditForm();
+    };
+
+    showEditForm() {
+        $taskFormEdit.classList.remove('hidden');
+        $overlay.classList.remove('hidden');
+    }
+
+    closeEditForm() {
         $taskFormEdit.classList.add('hidden');
         $overlay.classList.add('hidden');
-    };
+    }
 
 
 

@@ -5,6 +5,11 @@ body {
   position: relative;
 }
 
+h1 {
+  color: white;
+  font-weight: 700;
+}
+
 .icon {
   height: 70px;
   width: 70px;
@@ -19,8 +24,6 @@ body {
     color: transparent;
   }
 }
-
-
 
 .edit-section {
   position: fixed;
@@ -53,5 +56,13 @@ body {
   display: none;
   opacity: 0;
   transform: translateY(-50px);
+}
 
+.close-modal {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 3rem;
+  cursor: pointer;
+  stroke: #555;
 }
