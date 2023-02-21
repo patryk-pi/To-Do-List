@@ -66,7 +66,7 @@ class App {
         const taskDesc = $descInput.value;
         const taskDate = $dateInput.value;
 
-        if (!taskName || !taskDesc || !taskDate) {
+        if (!taskName || !taskDate) {
             alert('Uzupełnij wszystkie pola!');
             return;
         }
@@ -92,8 +92,8 @@ class App {
 
         this.plannedTasks.filter(task => task.active === true).forEach((task, index) => {
             this.updateTaskHtml(task, index);
-
         });
+
         this.addDoneButtonListeners();
         this.addDeleteButtonListener();
         this.addReturnButtonListener();
@@ -297,44 +297,48 @@ class App {
     }
 
     editTask(event) {
-        const dataId = +event.target.parentElement.parentElement.previousElementSibling.getAttribute('data-id');
+        let dataId = +event.target.parentElement.parentElement.previousElementSibling.getAttribute('data-id');
+
         $taskFormEdit.classList.remove('hidden');
         $overlay.classList.remove('hidden');
         $nameInputEdit.value = this.plannedTasks[dataId].name
         $descInputEdit.value = this.plannedTasks[dataId].description
         $dateInputEdit.value = this.plannedTasks[dataId].date;
-        this.plannedTasks.splice(dataId, 1);
+        // this.plannedTasks.splice(dataId, 1);
 
-        document.getElementById('btn-edit-task').addEventListener('click', e => {
+        $taskFormEdit.addEventListener('submit', e => {
             e.preventDefault();
+            this.submitEdition(dataId)
+            dataId = null;
+        })
+    }
 
-            this.plannedTasks.splice(dataId, 1);
-            const newTask = new Task(taskName, taskDesc, taskDate);
+    submitEdition(dataId) {
+            const taskToEdit = this.plannedTasks[dataId];
+            taskToEdit.name = $nameInputEdit.value;
+            taskToEdit.description = $descInputEdit.value;
+            taskToEdit.date = $dateInputEdit.value;
 
-            let dataFormLocalStorage = [];
-            if (localStorage.getItem('tasks') !== null) {
-                dataFormLocalStorage = JSON.parse(localStorage.getItem("tasks"));
-            }
 
-            this.plannedTasks.splice(dataId, 0, newTask);
-            console.log(newTask);
-            this.saveTaskToLocalStorage(newTask)
-            this.updatePlannedTasksList();
+            this.plannedTasks[dataId] = new Task(taskToEdit.name, taskToEdit.description, taskToEdit.date);
+            this.updateTasksList();
 
-            $nameInput.value = $descInput.value = '';
-            this.setDateInput();
+
+
 
             $taskFormEdit.classList.add('hidden');
             $overlay.classList.add('hidden');
-        })
+        };
 
-    }
+
+
 
     updateTasksList() {
         this.updateDoneTasksList();
         this.updatePlannedTasksList();
         const allTasks = [...this.plannedTasks, ...this.doneTasks]
         localStorage.setItem('tasks', JSON.stringify(allTasks));
+
     }
 
 
