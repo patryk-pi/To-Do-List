@@ -38,8 +38,9 @@ class Task {
     constructor(name, description, date) {
         this.name = name;
         this.description = description;
-        this.date = date;
+        this.plannedDate = date;
         this.active = true;
+        this.doneDate = null;
     }
 }
 
@@ -84,7 +85,52 @@ class App {
 
         $nameInput.value = $descInput.value = '';
         this.setDateInput();
+    }
 
+    // EVENT LISTENERS
+
+    addDoneButtonListeners() {
+        const doneButtons = document.querySelectorAll('.btn-done');
+
+        doneButtons.forEach(btn => {
+            btn.addEventListener('click', e => {
+                e.preventDefault()
+                this.markTaskAsDone(e);
+            })
+        })
+    }
+
+    addDeleteButtonListener() {
+        const deleteButtons = document.querySelectorAll('.btn-delete');
+
+        deleteButtons.forEach(btn => {
+            btn.addEventListener('click', e => {
+                e.preventDefault()
+                this.deleteTask(e)
+            })
+        });
+    }
+
+    addReturnButtonListener() {
+        const returnButtons = document.querySelectorAll('.btn-return');
+
+        returnButtons.forEach(btn => {
+            btn.addEventListener('click', e => {
+                e.preventDefault()
+                this.markTaskAsUndone(e);
+            })
+        })
+    }
+
+    addEditButtonListener() {
+        const editButtons = document.querySelectorAll('.btn-edit');
+
+        editButtons.forEach(btn => {
+            btn.addEventListener('click', e => {
+                e.preventDefault();
+                this.editTask(e);
+            })
+        })
     }
 
     updatePlannedTasksList() {
@@ -107,47 +153,6 @@ class App {
             this.updateTaskHtml(task, index);
         });
 
-    }
-
-    addDoneButtonListeners() {
-        const doneButtons = document.querySelectorAll('.btn-done');
-
-        doneButtons.forEach(btn => {
-            btn.addEventListener('click', e => {
-                this.markTaskAsDone(e);
-            })
-        })
-    }
-
-    addDeleteButtonListener() {
-        const deleteButtons = document.querySelectorAll('.btn-delete');
-
-        deleteButtons.forEach(btn => {
-            btn.addEventListener('click', e => {
-                this.deleteTask(e)
-            })
-        });
-    }
-
-    addReturnButtonListener() {
-        const returnButtons = document.querySelectorAll('.btn-return');
-
-        returnButtons.forEach(btn => {
-            btn.addEventListener('click', e => {
-                this.markTaskAsUndone(e);
-            })
-        })
-    }
-
-    addEditButtonListener() {
-        const editButtons = document.querySelectorAll('.btn-edit');
-
-        editButtons.forEach(btn => {
-            btn.addEventListener('click', e => {
-                e.preventDefault();
-                this.editTask(e);
-            })
-        })
     }
 
 
@@ -183,6 +188,8 @@ class App {
         }
     }
 
+    /////////////////
+
     renderTasks() {
         const allTasks = JSON.parse(localStorage.getItem("tasks"));
 
@@ -190,8 +197,8 @@ class App {
             this.plannedTasks.push(task);
         })
 
-        this.renderDoneTasks(allTasks);
-        this.renderPlannedTasks(allTasks);
+        this.renderAllTasks(allTasks, false);
+        this.renderAllTasks(allTasks, true);
         this.addDoneButtonListeners();
         this.addDeleteButtonListener();
         this.addReturnButtonListener();
@@ -199,75 +206,74 @@ class App {
 
     }
 
-    renderPlannedTasks(array) {
+    renderAllTasks(array, ifActive) {
         array.filter(task => {
-            return task.active === true;
+            return task.active === ifActive;
         }).forEach((task, i) => {
                 this.updateTaskHtml(task, i);
             }
         );
     }
 
-    renderDoneTasks(array) {
-        array.filter(task => {
-            return task.active !== true;
-        }).forEach((task, i) => {
-                this.updateTaskHtml(task, i);
-            }
-        );
-    }
 
     updateTaskHtml(task, index) {
-        const {name, description: desc, date, active} = task
-        const html = active === true ? `<div class="card mt-5">
-       
+        const {name, description: desc, plannedDate, active, doneDate} = task
+        const html = active === true ?
 
+            `<div class="card mt-5">
                 <div class="card-body" data-id="${index}">
                     <h5 class="card-title">${name}</h5>
                     <p class="card-text">${desc} </p>
                 </div>
-              
                 <div class="card-footer d-flex justify-content-around align-items-center">
                     
-                    <small class="text-muted">Zaplanowana data wykonania: ${date}</small>
+                    <small class="text-muted">Zaplanowana data wykonania: ${plannedDate}</small>
                     <div class="btn-group" role="group" >
-  <button type="button" class="btn btn-success btn-done">Wykonano</button>
-  <button type="button" class="btn btn-outline-warning btn-edit">Edytuj</button>
-  <button type="button" class="btn btn-outline-danger btn-delete">Usuń</button>
-</div>  </div>
-            </div>` : `<div class="card mt-5">
+                        <button type="button" class="btn btn-success btn-done">Wykonano</button>
+                        <button type="button" class="btn btn-outline-warning btn-edit">Edytuj</button>
+                        <button type="button" class="btn btn-outline-danger btn-delete">Usuń</button>
+                    </div> 
+                </div>
+            </div>` :
 
+            `<div class="card mt-5">
                 <div class="card-body" data-id="${index}">
                     <h5 class="card-title">${name}</h5>
                     <p class="card-text">${desc} </p>
                 </div>
-              
                 <div class="card-footer d-flex justify-content-around align-items-center">
-                    
-                    <small class="text-muted">Wykonano: ${date}</small>
+                    <small class="text-muted">Wykonano: ${doneDate}</small>
                     <div class="btn-group" role="group" >
-  <button type="button" class="btn btn-outline-success btn-return">Przywróc do zaplanowanych</button>
-  <button type="button" class="btn btn-outline-danger btn-delete">Usuń</button>
-</div>`
-
-
-        ;
+                        <button type="button" class="btn btn-outline-success btn-return">Przywróc do zaplanowanych</button>
+                        <button type="button" class="btn btn-outline-danger btn-delete">Usuń</button>
+                    </div>
+                </div>
+            </div>`
 
         active === true ? $plannedTasks.insertAdjacentHTML('beforeend', html) : $doneTasks.insertAdjacentHTML('beforeend', html);
+    }
 
-
+    updateTasksList() {
+        this.updateDoneTasksList();
+        this.updatePlannedTasksList();
+        const allTasks = [...this.plannedTasks, ...this.doneTasks]
+        localStorage.setItem('tasks', JSON.stringify(allTasks));
     }
 
 
-    moveTask(task) {
+
+
+    // TASKS ACTIONS
+
+    changeActiveStatus(task) {
         task.active === true ? task.active = false : task.active = true;
     }
 
     markTaskAsDone(event) {
-        event.preventDefault();
 
         const dataId = +event.target.parentElement.parentElement.previousElementSibling.getAttribute('data-id')
-        this.moveTask(this.plannedTasks[dataId])
+        this.changeActiveStatus(this.plannedTasks[dataId])
+        this.plannedTasks[dataId].doneDate = this.formatDate();
         this.doneTasks.push(this.plannedTasks[dataId]);
         this.plannedTasks.splice(dataId, 1)
         this.updateTasksList();
@@ -275,16 +281,15 @@ class App {
 
     markTaskAsUndone(event) {
 
-        event.preventDefault();
         const dataId = +event.target.parentElement.parentElement.previousElementSibling.getAttribute('data-id');
-        this.moveTask(this.doneTasks[dataId])
+        this.changeActiveStatus(this.doneTasks[dataId]);
+        this.doneTasks[dataId].doneDate = null;
         this.plannedTasks.push(this.doneTasks[dataId]);
         this.doneTasks.splice(dataId, 1)
         this.updateTasksList();
     }
 
     deleteTask(event) {
-        event.preventDefault();
         const dataId = +event.target.parentElement.parentElement.previousElementSibling.getAttribute('data-id');
         const targetArray = String(event.target.parentElement.parentElement.parentElement.parentElement.id);
         if (targetArray === 'planned-tasks') {
@@ -314,32 +319,20 @@ class App {
     }
 
     submitEdition(dataId) {
-            const taskToEdit = this.plannedTasks[dataId];
-            taskToEdit.name = $nameInputEdit.value;
-            taskToEdit.description = $descInputEdit.value;
-            taskToEdit.date = $dateInputEdit.value;
+        const taskToEdit = this.plannedTasks[dataId];
+        taskToEdit.name = $nameInputEdit.value;
+        taskToEdit.description = $descInputEdit.value;
+        taskToEdit.date = $dateInputEdit.value;
 
 
-            this.plannedTasks[dataId] = new Task(taskToEdit.name, taskToEdit.description, taskToEdit.date);
-            this.updateTasksList();
+        this.plannedTasks[dataId] = new Task(taskToEdit.name, taskToEdit.description, taskToEdit.date);
+        this.updateTasksList();
 
 
+        $taskFormEdit.classList.add('hidden');
+        $overlay.classList.add('hidden');
+    };
 
-
-            $taskFormEdit.classList.add('hidden');
-            $overlay.classList.add('hidden');
-        };
-
-
-
-
-    updateTasksList() {
-        this.updateDoneTasksList();
-        this.updatePlannedTasksList();
-        const allTasks = [...this.plannedTasks, ...this.doneTasks]
-        localStorage.setItem('tasks', JSON.stringify(allTasks));
-
-    }
 
 
 }
