@@ -359,9 +359,7 @@ class App {
 
     closeEditForm() {
         $taskFormEdit.classList.add('hidden');
-        $taskFormEdit.classList.remove('fade-in');
         $overlay.classList.add('hidden');
-        $overlay.classList.remove('fade-in');
     }
 
 
