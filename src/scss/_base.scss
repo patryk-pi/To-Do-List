@@ -39,7 +39,7 @@ h1 {
   z-index: 10;
 
   opacity: 1;
-  transition: all .3s ease;
+  transition: opacity .3s ease;
 
   &.hidden {
     opacity: 0;
