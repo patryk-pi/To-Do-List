@@ -226,10 +226,10 @@ class App {
                     <h5 class="card-title">${name}</h5>
                     <p class="card-text">${desc} </p>
                 </div>
-                <div class="card-footer d-flex justify-content-around align-items-center">
+                <div class="card-footer d-flex justify-content-around align-items-center flex-column flex-lg-row">
                     
-                    <small class="text-muted">Zaplanowana data wykonania: ${plannedDate}</small>
-                    <div class="btn-group" role="group" >
+                    <small class="text-muted col-sm mb-2 mb-lg-0">Zaplanowana data wykonania: <br>${plannedDate}</small>
+                    <div class="btn-group col-sm" role="group" >
                         <button type="button" class="btn btn-success btn-done">Wykonano</button>
                         <button type="button" class="btn btn-outline-warning btn-edit">Edytuj</button>
                         <button type="button" class="btn btn-outline-danger btn-delete">Usuń</button>
@@ -242,8 +242,8 @@ class App {
                     <h5 class="card-title">${name}</h5>
                     <p class="card-text">${desc} </p>
                 </div>
-                <div class="card-footer d-flex justify-content-around align-items-center">
-                    <small class="text-muted">Wykonano: ${doneDate}</small>
+                <div class="card-footer d-flex justify-content-around align-items-center flex-column flex-lg-row">
+                    <small class="text-muted col-sm mb-2 mb-lg-0">Wykonano: ${doneDate}</small>
                     <div class="btn-group" role="group" >
                         <button type="button" class="btn btn-outline-success btn-return">Przywróc do zaplanowanych</button>
                         <button type="button" class="btn btn-outline-danger btn-delete">Usuń</button>
