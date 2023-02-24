@@ -245,7 +245,7 @@ class App {
                 <div class="card-footer d-flex justify-content-around align-items-center flex-column flex-lg-row">
                     <small class="text-muted col-sm mb-2 mb-lg-0">Wykonano: ${doneDate}</small>
                     <div class="btn-group" role="group" >
-                        <button type="button" class="btn btn-outline-success btn-return">Przywróc do zaplanowanych</button>
+                        <button type="button" class="btn btn-outline-success btn-return">Przywróć do zaplanowanych</button>
                         <button type="button" class="btn btn-outline-danger btn-delete">Usuń</button>
                     </div>
                 </div>
