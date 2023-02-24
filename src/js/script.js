@@ -351,12 +351,17 @@ class App {
 
     showEditForm() {
         $taskFormEdit.classList.remove('hidden');
+        $taskFormEdit.classList.add('fade-in');
+
         $overlay.classList.remove('hidden');
+        $overlay.classList.add('fade-in');
     }
 
     closeEditForm() {
         $taskFormEdit.classList.add('hidden');
+        $taskFormEdit.classList.remove('fade-in');
         $overlay.classList.add('hidden');
+        $overlay.classList.remove('fade-in');
     }
 
 
